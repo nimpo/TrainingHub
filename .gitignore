@@ -1,0 +1,9 @@
+# Environment configuration
+.env
+
+secrets/*
+!secrets/.gitkeep
+
+mail/*
+!mail/.gitkeep
+

@@ -1,0 +1,18 @@
+email.{$DOMAIN} {
+    tls /certs/site.crt /certs/site.key
+    reverse_proxy roundcube:80
+}
+
+jupyter.{$DOMAIN} {
+    tls /certs/site.crt /certs/site.key
+    reverse_proxy jupyterhub:8000
+}
+
+{$DOMAIN} {
+    basic_auth {
+        admin {$CADDY_AUTH_HASH}
+    }
+    tls /certs/site.crt /certs/site.key
+    root * /srv/html
+    file_server
+}

@@ -1,0 +1,22 @@
+<html>
+<head>
+        <title>Schools RSE Experience Project</title>
+</head>
+<body>
+        <h1>Schools RSE Experience Project</h1>
+	<p>Welcome to your project pages. Your task is as follows.</p>
+	<p>Your team needs to design a company website...</p>
+	<p>You will be given a tempory email address for this project with which you need to register an account on GitHub.</p>
+	<p>You will then be invited to join a project on GitHub where you will find an emptr repository and a basic project board.</p>
+	<p>You can find your email server <a class="sub" href="email">here</a>.</p>
+	<p>You can find your Jupyter server <a class="sub" href="jupyter">here</a>.</p>
+<script>
+const hostname = window.location.hostname;
+const protocol = window.location.protocol;
+document.querySelectorAll("a.sub").forEach(link => {
+    const sub = link.getAttribute("href");
+    link.href = `${protocol}//${sub}.${hostname}`;
+});
+</script>
+</body> 
+</html>

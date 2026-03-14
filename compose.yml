@@ -1,0 +1,148 @@
+services:
+  jupyterhub-singleuser-image:
+    image: jupyterhub-singleuser-nokernel:latest
+    build:
+      context: ./jupyter
+      dockerfile: Dockerfile.singleuser
+    profiles:
+      - build-only
+
+  jupyterhub:
+    build:
+      context: ./jupyter/hub
+      dockerfile: Dockerfile
+    container_name: jupyterhub
+    restart: unless-stopped
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - jupyterhub-data:/srv/jupyterhub
+    environment:
+      DOCKER_NETWORK_NAME: ${COMPOSE_PROJECT_NAME:-tempemail}_default
+      DOCKER_JUPYTER_IMAGE: jupyterhub-singleuser-nokernel:latest
+        #    depends_on:
+        #      - jupyterhub-singleuser-image
+
+  caddy:
+    image: caddy:2.10
+    env_file:
+      - .env
+    ports:
+      - "443:443"
+      - "443:443/udp"
+    volumes:
+      - ./caddy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - ./html:/srv/html:ro
+      - ./certs:/certs:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - roundcube
+      - jupyterhub
+      - acme-le-bash
+    restart: unless-stopped
+    secrets:
+      - group_password
+    command: >
+      sh -c '
+        HASH=$$(caddy hash-password --plaintext "$$(cat /run/secrets/group_password)")
+        export CADDY_AUTH_HASH=$$HASH
+        exec caddy run --config /etc/caddy/Caddyfile
+      '
+
+  dovecot:
+    image: dovecot/dovecot:latest
+    volumes:
+      - ./mail:/srv/vmail
+      - ./dovecot/conf.d:/etc/dovecot/conf.d
+      - ./dovecot/auth.lua:/etc/dovecot/auth.lua:ro
+    secrets:
+      - group_password
+    restart: unless-stopped
+
+  roundcube:
+    image: roundcube/roundcubemail:latest
+    ports:
+      - "8080:80"
+    environment:
+      - ROUNDCUBEMAIL_DEFAULT_HOST=dovecot
+      - ROUNDCUBEMAIL_DEFAULT_PORT=31143
+      # No SMTP
+    depends_on:
+      - dovecot
+    restart: unless-stopped
+
+  getmail:
+    build:
+      context: ./getmail
+    env_file:
+      - .env
+    secrets:
+      - upstream_imap_password
+    user: "1000:1000"
+    environment:
+      - HOME=/home/getmail
+    volumes:
+      - ./getmail/config:/etc/getmail:ro
+      - ./mail:/srv/vmail
+      - ./mail/getmail:/var/lib/getmail
+    command: >
+      sh -lc '
+        envsubst < /etc/getmail/getmailrc.template > /home/getmail/getmailrc &&
+        while true
+        do
+          getmail --getmaildir=/var/lib/getmail --rcfile /home/getmail/getmailrc;
+          sleep 60;
+        done
+      '
+    restart: unless-stopped
+
+  acme-le-bash:
+    build:
+      context: ./acme-le-bash
+    env_file:
+      - .env
+    environment:
+      DOMAIN: ${DOMAIN}
+      ACME_EMAIL: "admin@${DOMAIN}"
+      FQDNS: "${DOMAIN} jupyter.${DOMAIN} email.${DOMAIN}"
+      AWS_CONFIG_FILE: /run/secrets/aws_config
+      AWS_SHARED_CREDENTIALS_FILE: /run/secrets/aws_credentials
+    secrets:
+      - aws_credentials
+    volumes:
+      #      - ./acme-le-bash:/acme
+      - ./certs:/certs
+    working_dir: /app/acme-le-bash
+    command: >
+      bash -lc '
+        reqfunction() {
+          /app/acme-le-bash/acme.sh -C "$1" -k "$2" $$VERBOSE -DAWS -e "$$ACME_EMAIL" $${FQDNS[@]}
+        }
+        export -f reqfunction
+        while true
+        do
+          ./monitorCert.sh -v -capath /etc/ssl/certs \
+            -cert /certs/site.crt \
+            -key /certs/site.key \
+            $$FQDNS
+          sleep 86400
+        done
+      '
+      #    profiles:
+      #- dev
+
+
+volumes:
+  caddy_data:
+  caddy_config:
+  jupyterhub-data:
+
+secrets:
+  upstream_imap_password:
+    file: ./secrets/imap_password.txt
+  aws_credentials:
+    file: ./secrets/aws-credentials
+  aws_config:
+    file: ./secrets/aws-config
+  group_password:
+    file: ./secrets/group_password.txt

@@ -1,0 +1,22 @@
+[retriever]
+type = SimpleIMAPSSLRetriever
+server = ${IMAP_SERVER}
+port = ${IMAP_PORT}
+username = ${IMAP_USERNAME}
+password_command = ("cat", "/run/secrets/upstream_imap_password")
+mailboxes = ("INBOX",)
+
+[destination]
+type = MDA_external
+path = /usr/local/bin/deliver-by-recipient.py
+arguments = ()
+
+[options]
+# Leave mail on the upstream server (recommended while testing)
+delete = false
+
+# Where getmail stores its “state” (so it doesn’t re-download everything)
+read_all = false
+
+# Logging
+verbose = 1

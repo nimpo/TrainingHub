@@ -1,0 +1,48 @@
+FROM python:3.12-slim
+
+ENV DEBIAN_FRONTEND=noninteractive \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    bash \
+    ca-certificates \
+    curl \
+    git \
+    openssh-client \
+    tini \
+    less \
+    nano \
+    vim \
+    procps \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN useradd -m -s /bin/bash -u 1000 jovyan
+
+RUN pip install --no-cache-dir \
+    jupyterhub \
+    jupyterlab \
+    jupyter-server \
+    jupyter-server-terminals \
+    jupyterlab-git \
+ && jupyter kernelspec remove -f python3 || true
+
+RUN jupyter labextension disable --level=system "@jupyterlab/apputils-extension:announcements" || true
+
+RUN jupyter labextension disable @jupyterlab/help-extension \
+ && jupyter labextension disable @jupyterlab/markdownviewer-extension || true
+
+RUN mkdir -p /home/jovyan/.jupyter && \
+    printf '%s\n' \
+    "c = get_config()" \
+    "c.ServerApp.root_dir = '/home/jovyan'" \
+    "c.ServerApp.default_url = '/lab'" \
+    "c.KernelSpecManager.ensure_native_kernel = False" \
+    > /home/jovyan/.jupyter/jupyter_server_config.py && \
+    chown -R jovyan:jovyan /home/jovyan
+
+USER jovyan
+ENV SHELL=/bin/bash
+WORKDIR /home/jovyan
+ENTRYPOINT ["tini", "-g", "--"]
+CMD ["jupyterhub-singleuser"]
