@@ -3,10 +3,10 @@
  - an EMAIL catchall service with MX rcords set for that domain that has IMAP service for getmail to draw down mails from (I use forwardemail.net)
 
 # Configure
-Add settings to .env, use the `env.template` to help.
-Add a default profile to `secrets/aws-config` and `secrets/aws-credentials` for access to add records to Route53 for domain.
-Add upstream password to the file `secrets/imap_password.txt`
-Add group password to the file `secrets/group_password.txt`
+1. Add settings to .env, use the `env.template` to help.
+1. Add a default profile to `secrets/aws-config` and `secrets/aws-credentials` for access to add records to Route53 for domain.
+1. Add upstream password to the file `secrets/imap_password.txt`
+1. Add group password to the file `secrets/group_password.txt`
 
 # Build
 - Need to build with additional profile as Jupyter single user container needs building too.
