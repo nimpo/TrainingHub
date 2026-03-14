@@ -12,5 +12,8 @@ RUN groupadd -g 1000 getmail \
 COPY deliver-by-recipient.py /usr/local/bin/deliver-by-recipient.py
 RUN chmod +x /usr/local/bin/deliver-by-recipient.py
 
+RUN mkdir -p /var/lib/getmail \
+ && chown -R 1000:1000 /var/lib/getmail
+
 USER getmail
 WORKDIR /home/getmail

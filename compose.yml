@@ -84,7 +84,7 @@ services:
     volumes:
       - ./getmail/config:/etc/getmail:ro
       - ./mail:/srv/vmail
-      - ./mail/getmail:/var/lib/getmail
+      - getmail_state:/var/lib/getmail
     command: >
       sh -lc '
         envsubst < /etc/getmail/getmailrc.template > /home/getmail/getmailrc &&
@@ -128,14 +128,12 @@ services:
           sleep 86400
         done
       '
-      #    profiles:
-      #- dev
-
 
 volumes:
   caddy_data:
   caddy_config:
   jupyterhub-data:
+  getmail_state:
 
 secrets:
   upstream_imap_password:
