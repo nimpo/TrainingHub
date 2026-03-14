@@ -21,7 +21,7 @@ docker compose up -d
 
 Have DNS records or entries in /etc/hosts that point to hosting service ip.
 
-# Browse to https://\<your\_domain\>
+Browse to https://\<your\_domain\>
 
 # TODO
 make some nice html content for https://${DOMAIN}
