@@ -1,5 +1,5 @@
 # Purpose
-Training hub is designed to provide a simple way to demonstrate Research Software Engineering with an agile development methodology. You will need a domain registered in Route53 (e.g. traininghub.example.org)
+Training hub is designed to provide a simple platform to demonstrate Research Software Engineering with an agile development methodology. You will need a domain registered in Route53 (e.g. traininghub.example.org)
 
 An instance of TrainingHub provides three user facing services.
  - A frontend website at (in the case of our example domain) https://traininghub.example.org
