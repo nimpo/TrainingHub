@@ -3,6 +3,7 @@
 
 secrets/*
 !secrets/.gitkeep
+!secrets/README.md
 
 mail/*
 !mail/.gitkeep
