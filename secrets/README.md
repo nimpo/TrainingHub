@@ -1,6 +1,6 @@
 # Secrets
 
-## In this directory you should have four files:
+## In this directory you should have five files:
 * `aws-config` containing AWS Cli config
 ```
 [default]
@@ -22,3 +22,9 @@ SingleLineGroupPasswordPrefix
 ```
 SingleLinePasswordForForwardemail.netIMAPAccount
 ```
+
+* `jupyterhub_admin_password.txt` The password of the jupyter admin account
+```
+SingleLinePassword
+```
+

@@ -19,8 +19,8 @@ services:
     environment:
       DOCKER_NETWORK_NAME: ${COMPOSE_PROJECT_NAME:-tempemail}_default
       DOCKER_JUPYTER_IMAGE: jupyterhub-singleuser-nokernel:latest
-        #    depends_on:
-        #      - jupyterhub-singleuser-image
+    secrets:
+      - jupyterhub_admin_password
 
   caddy:
     image: caddy:2.10
@@ -154,3 +154,6 @@ secrets:
     file: ./secrets/aws-config
   group_password:
     file: ./secrets/group_password.txt
+      secrets:
+  jupyterhub_admin_password:
+    file: ./secrets/jupyterhub_admin_password.txt
