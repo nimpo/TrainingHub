@@ -5,5 +5,11 @@ RUN pip install --no-cache-dir \
     jupyterhub-nativeauthenticator
 
 COPY jupyterhub_config.py /srv/jupyterhub/jupyterhub_config.py
+COPY bootstrap-admin.py /usr/local/bin/bootstrap-admin.py
+COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 
-CMD ["jupyterhub", "-f", "/srv/jupyterhub/jupyterhub_config.py"]
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh
+
+ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
+
+#CMD ["jupyterhub", "-f", "/srv/jupyterhub/jupyterhub_config.py"]
