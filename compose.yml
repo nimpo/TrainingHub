@@ -154,6 +154,5 @@ secrets:
     file: ./secrets/aws-config
   group_password:
     file: ./secrets/group_password.txt
-      secrets:
   jupyterhub_admin_password:
     file: ./secrets/jupyterhub_admin_password.txt
