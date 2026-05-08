@@ -21,4 +21,4 @@ if not auth.user_exists("admin"):
   if created is None:
     raise RuntimeError( "Admin user was not created. Password may not meet NativeAuthenticator password rules.")
 
-print(f"Admin user '{username}' exists.")
+print(f"Admin user exists.")
