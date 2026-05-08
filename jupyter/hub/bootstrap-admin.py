@@ -17,7 +17,7 @@ auth.admin_users = {"admin"}
 auth.open_signup = True
 
 if not auth.user_exists("admin"):
-  created = auth.create_user(username, password)
+  created = auth.create_user("admin", password)
   if created is None:
     raise RuntimeError( "Admin user was not created. Password may not meet NativeAuthenticator password rules.")
 
