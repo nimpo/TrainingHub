@@ -2,13 +2,11 @@ import os
 from jupyterhub.app import JupyterHub
 from nativeauthenticator import NativeAuthenticator
 
-password_file = os.environ.get("JUPYTERHUB_ADMIN_PASSWORD_FILE")
+with open("/run/secrets/jupyterhub_admin_password.txt", "r") as f:
+  password = f.read().strip()
 
-if password_file:
-  with open(password_file, "r") as f:
-    password = f.read().strip()
-else:
-  raise RuntimeError("Admin password nto found in docker secrets")
+if not password:
+  raise RuntimeError("Admin password not found in docker secrets.")
 
 app = JupyterHub.instance()
 app.load_config_file("/srv/jupyterhub/jupyterhub_config.py")
