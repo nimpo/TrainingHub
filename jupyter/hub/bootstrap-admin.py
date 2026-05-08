@@ -2,7 +2,7 @@ import os
 from jupyterhub.app import JupyterHub
 from nativeauthenticator import NativeAuthenticator
 
-with open("/run/secrets/jupyterhub_admin_password.txt", "r") as f:
+with open("/run/secrets/jupyterhub_admin_password", "r") as f:
   password = f.read().strip()
 
 if not password:
