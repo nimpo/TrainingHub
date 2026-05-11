@@ -1,4 +1,7 @@
 import os
+from pathlib import Path
+from jupyterhub.auth import Authenticator
+import re
 
 c = get_config()
 
@@ -7,15 +10,34 @@ c.JupyterHub.bind_url = "http://:8000"
 c.JupyterHub.hub_ip = "0.0.0.0"
 
 # Authentication
-# NativeAuthenticator gives you local JupyterHub-managed accounts,
-# without needing Linux users on the host.
-c.JupyterHub.authenticator_class = "nativeauthenticator.NativeAuthenticator"
+GROUP_PASSWORD = Path("/run/secrets/group_password").read_text().strip()
+ADMIN_PASSWORD = Path("/run/secrets/jupyterhub_admin_password").read_text().strip()
 
-# Allow users to sign up
-c.NativeAuthenticator.open_signup = True
+class GroupPasswordAuthenticator(Authenticator):
+    async def authenticate(self, handler, data):
+        username = data["username"].strip().lower()
+        password = data["password"]
+
+        if not re.fullmatch(r"[a-z0-9._-]+", username):
+            return None
+
+        if username == "admin":
+            if password == ADMIN_PASSWORD:
+                return username
+            return None
+
+        if not os.path.isdir(os.path.join('/srv/vmail', username)):
+            return None
+
+        expected = f"{GROUP_PASSWORD}-{username}"
+
+        if password == expected:
+            return username
+
+        return None
+
+c.JupyterHub.authenticator_class = GroupPasswordAuthenticator
 c.Authenticator.allow_all = True
-
-# Make the first admin account manually after signup if you want:
 c.Authenticator.admin_users = {"admin"}
 
 # Spawner
@@ -57,3 +79,4 @@ c.DockerSpawner.cpu_limit = 0.25
 # Timeouts
 c.Spawner.http_timeout = 120
 c.Spawner.start_timeout = 120
+

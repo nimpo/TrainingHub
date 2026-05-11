@@ -41,6 +41,56 @@ RUN mkdir -p /home/jovyan/.jupyter && \
     > /home/jovyan/.jupyter/jupyter_server_config.py && \
     chown -R jovyan:jovyan /home/jovyan
 
+RUN cat >/etc/profile.d/jupyter-welcome.sh <<'EOF'
+
+border()
+{
+  WIDTH=$(tput cols 2>/dev/null || echo 80)
+  printf '%*s\n' "$WIDTH" '' | tr ' ' '*'
+}
+
+centre()
+{
+  WIDTH=$(tput cols 2>/dev/null || echo 80)
+  INNER=$((WIDTH - 4))
+  a=$*
+  if [ "$a" ]
+  then
+    while [ "$a" ] 
+    do 
+      TEXT=`printf "%s end" "$a" |sed "s/\(.\{0,$INNER\}\) .*/\1/"` 
+      LEN=$(printf "%s" "$TEXT" | wc -c)
+      [ "$LEN" -gt "$INNER" ] && printf '* %s *\n' "$TEXT" && a=${a#"$TEXT"} && a=${a# } && continue
+      PAD_TOTAL=$((INNER - LEN))
+      PAD_LEFT=$((PAD_TOTAL / 2))
+      PAD_RIGHT=$((PAD_TOTAL - PAD_LEFT))
+      printf '* '
+      printf '%*s' "$PAD_LEFT" ''
+      printf '%s' "$TEXT"
+      printf '%*s' "$PAD_RIGHT" ''
+      printf ' *\n'
+      a=${a#"$TEXT"}
+      a=${a# }
+    done
+  else
+    printf '* %*s *\n' "$INNER" ''
+  fi
+}
+
+sleep 1
+border
+centre
+centre Welcome $JUPYTERHUB_USER
+centre 
+centre You are on a single-user Jupyter server.
+centre 
+centre "Inside this self-contained server the Linux username is 'jovyan'."
+centre 
+centre "'Jovyan' is a reference to 'Jovian': someone from the planet Jupiter; like Martian is to the planet Mars."
+centre
+border
+EOF
+
 USER jovyan
 ENV SHELL=/bin/bash
 WORKDIR /home/jovyan
