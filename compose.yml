@@ -16,11 +16,14 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - jupyterhub-data:/srv/jupyterhub
+      - ./jupyter/hub/jupyterhub_config.py:/srv/jupyterhub/jupyterhub_config.py:ro
+      - ./mail:/srv/vmail:ro
     environment:
       DOCKER_NETWORK_NAME: ${COMPOSE_PROJECT_NAME:-tempemail}_default
       DOCKER_JUPYTER_IMAGE: jupyterhub-singleuser-nokernel:latest
     secrets:
       - jupyterhub_admin_password
+      - group_password
 
   caddy:
     image: caddy:2.10
@@ -110,7 +113,6 @@ services:
     secrets:
       - aws_credentials
     volumes:
-      #      - ./acme-le-bash:/acme
       - ./certs:/certs
     working_dir: /app/acme-le-bash
     command: >
