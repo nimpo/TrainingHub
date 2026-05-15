@@ -13,6 +13,7 @@ jupyter.{$DOMAIN} {
         admin {$CADDY_AUTH_HASH}
     }
     tls /certs/site.crt /certs/site.key
-    root * /srv/html
+    root * /srv/html/public
+    php_fastcgi php:9000
     file_server
 }
