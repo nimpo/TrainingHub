@@ -95,6 +95,7 @@ services:
       - .env
     secrets:
       - upstream_imap_password
+      - github_token
     user: "1000:1000"
     environment:
       - HOME=/home/getmail
