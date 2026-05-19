@@ -1,8 +1,4 @@
 <?php
-
-#ini_set('display_errors', 0);
-#error_reporting(E_ALL);
-
 putenv('GIT_TERMINAL_PROMPT=0');
 putenv('GIT_ASKPASS=/usr/local/bin/git-askpass');
 
@@ -39,26 +35,10 @@ if (($data['ref'] ?? '') !== 'refs/heads/main') {
 
 $repo = $data['repository']['name'] ?? null;
 
-#$allowedRepos = [
-#    'my-repo' => '/srv/html/repos/my-repo',
-#    'another-repo' => '/srv/html/repos/another-repo',
-#];
-#
-#if (!isset($allowedRepos[$repo])) {
-#    http_response_code(403);
-#    echo 'Repo not allowed';
-#    exit;
-#}
-
-#$repoDir = $allowedRepos[$repo];
-
-#if (  is_dir('/srv/html/Repos/'.escapeshellarg($repo)) ) {
 $cmd="";
 $repoDir = "/srv/html/Repos/$repo";
 if (  is_dir("/srv/html/Repos/$repo") ) {
-#  $cmd = sprintf('cd "/srv/html/Repos/%s" && git pull --ff-only 2>&1', escapeshellarg($repo) );
-  $cmd = sprintf('cd %s && git pull --ff-only 2>&1', escapeshellarg($repoDir)
-    );
+  $cmd = sprintf('cd %s && git pull --ff-only 2>&1', escapeshellarg($repoDir));
   $output = shell_exec($cmd);
 }
 else {
