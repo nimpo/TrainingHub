@@ -5,6 +5,8 @@ export GH_TOKEN=`cat /run/secrets/github_token`
 
 if [ -f /state/setup-complete ]
 then
+  gh api -H "Accept: application/vnd.github+json"   -H "X-GitHub-Api-Version: 2026-03-10" /orgs/UoMRIT4SalfordCityAcademy/members |jq -r .[].login > /tmp/members
+
   flock -n "/teams/.lock" bash -c '
     ME=`gh api user |jq -j .login`
     echo "Polling for groups"
@@ -15,6 +17,19 @@ then
         | jq -r .[].login \
         | grep -v "^$ME$" \
         | tee /teams/$team
+      if [ "$team" = "$CLASSNAME" ]
+      then
+        while read member 
+        do
+          if [ "$member" ]
+          then
+            if ! grep -q "^$member$" /teams/$team 
+            then
+              gh api --method PUT -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2026-03-10" /orgs/$GITHUB_ORG/teams/$team/memberships/$member
+            fi
+          fi   
+        done < /tmp/members
+      fi       
     done < <( gh api "/orgs/$GITHUB_ORG/teams" |jq -r .[].slug )
   ' || true
 else
