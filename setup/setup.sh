@@ -28,7 +28,7 @@ then
             echo "Checking this member=$member"
             if ! grep -q "^$member$" /teams/$team 
             then
-              echo "Member $member is not in the team $team, let`s add them
+              echo "Member $member is not in the team $team, lets add them
               gh api --method PUT -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2026-03-10" /orgs/$GITHUB_ORG/teams/$team/memberships/$member | jq .
             fi
           fi   
