@@ -17,14 +17,18 @@ then
         | jq -r .[].login \
         | grep -v "^$ME$" \
         | tee /teams/$team
+      echo
       if [ "$team" = "$CLASSNAME" ]
       then
+        echo "Checking $CLASSNAME"
         while read member 
         do
           if [ "$member" ]
           then
+            echo "Checking this member=$member"
             if ! grep -q "^$member$" /teams/$team 
             then
+              echo "Member $member is not in the team $team, let`s add them
               gh api --method PUT -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2026-03-10" /orgs/$GITHUB_ORG/teams/$team/memberships/$member | jq .
             fi
           fi   
