@@ -32,7 +32,7 @@ then
               gh api --method PUT -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2026-03-10" /orgs/$GITHUB_ORG/teams/$team/memberships/$member | jq .
             fi
           fi   
-        done < /tmp/members
+        done < <( grep -v "^$ME$" /tmp/members )
       fi       
     done < <( gh api "/orgs/$GITHUB_ORG/teams" |jq -r .[].slug )
   ' || true
