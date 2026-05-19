@@ -8,8 +8,18 @@ jupyter.{$DOMAIN} {
     reverse_proxy jupyterhub:8000
 }
 
+*.pages.{$DOMAIN} {
+    tls /certs/site.crt /certs/site.key
+
+    root * /srv/html/Repos/{labels.3}/public_html
+    file_server
+}
+
 {$DOMAIN} {
-    basic_auth {
+
+    @notWebhook not path /webhook.php
+
+    basic_auth @notWebhook {
         admin {$CADDY_AUTH_HASH}
     }
     tls /certs/site.crt /certs/site.key
@@ -17,3 +27,4 @@ jupyter.{$DOMAIN} {
     php_fastcgi php:9000
     file_server
 }
+

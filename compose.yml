@@ -35,6 +35,7 @@ services:
     volumes:
       - ./caddy/Caddyfile:/etc/caddy/Caddyfile:ro
       - ./html/public:/srv/html/public:ro
+      - ./html/Repos:/srv/html/Repos:ro
       - ./certs:/certs:ro
       - caddy_data:/data
       - caddy_config:/config
@@ -59,12 +60,40 @@ services:
     working_dir: /srv/html
     volumes:
       - ./html/public:/srv/html/public:ro
+      - ./html/teams:/srv/html/teams
+      - ./html/Repos:/srv/html/Repos
       - ./mail:/srv/html/mail:ro
     secrets:
       - github_token
+      - github_webhook_secret
     env_file:
       - .env
+    environment:
+      HOME: /home/app
+      XDG_CONFIG_HOME: /home/app/.config
+      GIT_TERMINAL_PROMPT: "0"
+      GIT_ASKPASS: /usr/local/bin/git-askpass
     restart: unless-stopped
+
+  setup:
+    build: ./setup
+    user: "1000:1000"
+    restart: unless-stopped
+    volumes:
+      - setup-state:/state
+      - ./html/teams:/teams
+    env_file:
+      - .env
+    secrets:
+      - github_token
+    command: >
+      bash -lc '
+        while true
+        do
+          ./setup.sh;
+          sleep 60;
+        done
+      '
 
   dovecot:
     image: dovecot/dovecot:latest
@@ -161,6 +190,7 @@ volumes:
   caddy_config:
   jupyterhub-data:
   getmail_state:
+  setup-state:
 
 secrets:
   upstream_imap_password:
@@ -175,3 +205,5 @@ secrets:
     file: ./secrets/jupyterhub_admin_password.txt
   github_token:
     file: ./secrets/github_token.txt
+  github_webhook_secret:
+    file: ./secrets/github_webhook_secret.txt
