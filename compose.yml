@@ -58,6 +58,7 @@ services:
     build:
       context: ./php
     working_dir: /srv/html
+    user: "${UID}:${GID}"
     volumes:
       - ./html/public:/srv/html/public:ro
       - ./html/teams:/srv/html/teams
@@ -77,10 +78,10 @@ services:
 
   setup:
     build: ./setup
-    user: "1000:1000"
+    user: "${UID}:${GID}"
     restart: unless-stopped
     volumes:
-      - setup-state:/state
+      - ./state/setup:/state
       - ./html/teams:/teams
     env_file:
       - .env
@@ -125,13 +126,13 @@ services:
     secrets:
       - upstream_imap_password
       - github_token
-    user: "1000:1000"
+        #    user: "${UID}:${GID}"
     environment:
       - HOME=/home/getmail
     volumes:
       - ./getmail/config:/etc/getmail:ro
       - ./mail:/srv/vmail
-      - getmail_state:/var/lib/getmail
+      - ./state/getmail:/var/lib/getmail
     command: >
       sh -lc '
         envsubst < /etc/getmail/getmailrc.template > /home/getmail/getmailrc &&
@@ -151,7 +152,7 @@ services:
     environment:
       DOMAIN: ${DOMAIN}
       ACME_EMAIL: "admin@${DOMAIN}"
-      FQDNS: "${DOMAIN} jupyter.${DOMAIN} email.${DOMAIN}"
+      FQDNS: "${DOMAIN} jupyter.${DOMAIN} email.${DOMAIN} *.pages.${DOMAIN}"
       AWS_CONFIG_FILE: /run/secrets/aws_config
       AWS_SHARED_CREDENTIALS_FILE: /run/secrets/aws_credentials
     secrets:
@@ -189,8 +190,6 @@ volumes:
   caddy_data:
   caddy_config:
   jupyterhub-data:
-  getmail_state:
-  setup-state:
 
 secrets:
   upstream_imap_password:
