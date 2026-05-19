@@ -18,4 +18,6 @@ COPY setup.sh .
 
 RUN chmod +x setup.sh
 
+RUN groupadd -g 1000 app && \
+    useradd -m -u 1000 -g 1000 -s /bin/bash app
 #CMD ["./setup.sh"]
