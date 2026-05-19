@@ -7,7 +7,7 @@ header("Expires: 0");
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
 
-require __DIR__ . '/../../vendor/autoload.php';
+require __DIR__ . '/srv/html/vendor/autoload.php';
 
 use Github\Client;
 use Github\AuthMethod;
@@ -63,6 +63,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
     fclose($lockHandle);
+    header("Location: " . strtok($_SERVER["REQUEST_URI"], '?'));
+    exit;
 }
 ####################################
 
