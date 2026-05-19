@@ -7,7 +7,7 @@ header("Expires: 0");
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
 
-require __DIR__ . '/srv/html/vendor/autoload.php';
+require '/srv/html/vendor/autoload.php';
 
 use Github\Client;
 use Github\AuthMethod;
