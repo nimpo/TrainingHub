@@ -39,7 +39,7 @@ def invite_email_to_github_org(email):
         with urllib.request.urlopen(req, timeout=10) as response:
             return response.status
     except urllib.error.HTTPError as e:
-        logging.warning("GitHub org invite failed for %s; Status: %s",email,e.code)
+#        logging.warning("GitHub org invite failed for %s; Status: %s",email,e.code)
         return None
 
 domain = os.environ.get("DOMAIN")
