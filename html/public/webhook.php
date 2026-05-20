@@ -47,5 +47,7 @@ else {
 }
 
 header('Content-Type: text/plain');
-echo "OK";
+echo "OK\n";
+echo "Command = $cmd\n";
+echo "Output - $output\n";
 ?>
