@@ -17,9 +17,11 @@ jupyter.{$DOMAIN} {
 
 {$DOMAIN} {
 
-    @notWebhook not path /webhook.php
+    @protected {
+        not path / /index.html /webhook.php
+    }
 
-    basic_auth @notWebhook {
+    basic_auth @@protected {
         admin {$CADDY_AUTH_HASH}
     }
     tls /certs/site.crt /certs/site.key
