@@ -34,7 +34,8 @@ services:
       - "443:443/udp"
     volumes:
       - ./caddy/Caddyfile:/etc/caddy/Caddyfile:ro
-      - ./html:/srv/html:ro
+      - ./html/public:/srv/html/public:ro
+      - ./html/Repos:/srv/html/Repos:ro
       - ./certs:/certs:ro
       - caddy_data:/data
       - caddy_config:/config
@@ -42,6 +43,7 @@ services:
       - roundcube
       - jupyterhub
       - acme-le-bash
+      - php
     restart: unless-stopped
     secrets:
       - group_password
@@ -50,6 +52,48 @@ services:
         HASH=$$(caddy hash-password --plaintext "$$(cat /run/secrets/group_password)")
         export CADDY_AUTH_HASH=$$HASH
         exec caddy run --config /etc/caddy/Caddyfile
+      '
+
+  php:
+    build:
+      context: ./php
+    working_dir: /srv/html
+    user: "${UID}:${GID}"
+    volumes:
+      - ./html/public:/srv/html/public:ro
+      - ./html/teams:/srv/html/teams
+      - ./html/Repos:/srv/html/Repos
+      - ./mail:/srv/html/mail:ro
+    secrets:
+      - github_token
+      - github_webhook_secret
+    env_file:
+      - .env
+    environment:
+      HOME: /home/app
+      XDG_CONFIG_HOME: /home/app/.config
+      GIT_TERMINAL_PROMPT: "0"
+      GIT_ASKPASS: /usr/local/bin/git-askpass
+    restart: unless-stopped
+
+  setup:
+    build: ./setup
+    user: "${UID}:${GID}"
+    restart: unless-stopped
+    volumes:
+      - ./state/setup:/state
+      - ./html/teams:/teams
+    env_file:
+      - .env
+    secrets:
+      - github_token
+    command: >
+      bash -lc '
+        while true
+        do
+          ./setup.sh;
+          sleep 60;
+        done
       '
 
   dovecot:
@@ -81,13 +125,14 @@ services:
       - .env
     secrets:
       - upstream_imap_password
-    user: "1000:1000"
+      - github_token
+        #    user: "${UID}:${GID}"
     environment:
       - HOME=/home/getmail
     volumes:
       - ./getmail/config:/etc/getmail:ro
       - ./mail:/srv/vmail
-      - getmail_state:/var/lib/getmail
+      - ./state/getmail:/var/lib/getmail
     command: >
       sh -lc '
         envsubst < /etc/getmail/getmailrc.template > /home/getmail/getmailrc &&
@@ -107,7 +152,7 @@ services:
     environment:
       DOMAIN: ${DOMAIN}
       ACME_EMAIL: "admin@${DOMAIN}"
-      FQDNS: "${DOMAIN} jupyter.${DOMAIN} email.${DOMAIN}"
+      FQDNS: "${DOMAIN} jupyter.${DOMAIN} email.${DOMAIN} *.pages.${DOMAIN}"
       AWS_CONFIG_FILE: /run/secrets/aws_config
       AWS_SHARED_CREDENTIALS_FILE: /run/secrets/aws_credentials
     secrets:
@@ -145,7 +190,6 @@ volumes:
   caddy_data:
   caddy_config:
   jupyterhub-data:
-  getmail_state:
 
 secrets:
   upstream_imap_password:
@@ -158,3 +202,7 @@ secrets:
     file: ./secrets/group_password.txt
   jupyterhub_admin_password:
     file: ./secrets/jupyterhub_admin_password.txt
+  github_token:
+    file: ./secrets/github_token.txt
+  github_webhook_secret:
+    file: ./secrets/github_webhook_secret.txt
