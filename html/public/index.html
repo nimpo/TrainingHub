@@ -18,20 +18,17 @@
   <h3>Tutors and administrators</h3>
   <p>You will find a page showing the progress of your class' enrolement progress <a href="class">here</a>. Once the class has registered for a github account they can be assigned to teams via that page.</p> 
 <script>
-  document.getElementById('email').textContent = 'firstname.surname@'+window.location.hostname;
-</script>
-<script>
 const hostname = window.location.hostname;
 const protocol = window.location.protocol;
+
+document.getElementById('email').textContent = 'firstname.surname@'+hostname;
+
 document.querySelectorAll("a.suburl").forEach(link => {
     const sub = link.getAttribute("href");
     link.href = `${protocol}//${sub}.${hostname}`;
     link.textContent = `${sub}.${hostname}`;
 });
-</script>
-<script>
-const hostname = window.location.hostname;
-const protocol = window.location.protocol;
+
 document.querySelectorAll("a.sub").forEach(link => {
     const sub = link.getAttribute("href");
     link.href = `${protocol}//${sub}.${hostname}`;
