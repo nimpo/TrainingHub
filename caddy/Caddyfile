@@ -20,6 +20,14 @@ jupyter.{$DOMAIN} {
     reverse_proxy jupyterhub:8000
 }
 
+pages.{$DOMAIN} {
+    import ipfilter
+    tls /certs/site.crt /certs/site.key
+    root * /srv/html/Repos
+    rewrite * /index.php
+    php_fastcgi php:9000
+}
+
 *.pages.{$DOMAIN} {
     import ipfilter
     tls /certs/site.crt /certs/site.key
