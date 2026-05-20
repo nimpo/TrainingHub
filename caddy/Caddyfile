@@ -1,7 +1,7 @@
 # Add all allowed CIDRS here space separated immediately 127.0.0.0/8
 (ipfilter) {
     @notallowed {
-        not remote_ip 127.0.0.0/8 {args[:]}
+        not remote_ip 127.0.0.0/8 {$ALLOWED_IPS} {args[:]}
     }
     handle @notallowed {
         respond @notallowed "Forbidden" 403
