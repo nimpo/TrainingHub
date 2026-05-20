@@ -3,7 +3,9 @@
     @notallowed {
         not remote_ip 127.0.0.0/8 {args[:]}
     }
-    respond @notallowed "Forbidden" 403
+    handle @notallowed {
+        respond @notallowed "Forbidden" 403
+    }
 }
 
 email.{$DOMAIN} {
