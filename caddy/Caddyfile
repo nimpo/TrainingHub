@@ -1,32 +1,55 @@
+# Add all allowed CIDRS here space separated immediately 127.0.0.0/8
+(ipfilter) {
+    @notallowed {
+        not remote_ip 127.0.0.0/8 {args[:]}
+    }
+    respond @notallowed "Forbidden" 403
+}
+
 email.{$DOMAIN} {
+    import ipfilter 
     tls /certs/site.crt /certs/site.key
     reverse_proxy roundcube:80
 }
 
 jupyter.{$DOMAIN} {
+    import ipfilter
     tls /certs/site.crt /certs/site.key
     reverse_proxy jupyterhub:8000
 }
 
 *.pages.{$DOMAIN} {
+    import ipfilter
     tls /certs/site.crt /certs/site.key
-
     root * /srv/html/Repos/{labels.3}/public_html
     file_server
 }
 
 {$DOMAIN} {
-
-    @protected {
-        not path / /index.html /webhook.php
-    }
-
-    basic_auth @protected {
-        admin {$CADDY_AUTH_HASH}
-    }
     tls /certs/site.crt /certs/site.key
     root * /srv/html/public
-    php_fastcgi php:9000
-    file_server
+    @public {
+        path / /index.html
+    }
+
+    handle @public {
+        php_fastcgi php:9000
+        file_server
+    }
+
+    handle /webhooks.php {
+        import ipfilter 192.30.252.0/22 185.199.108.0/22 140.82.112.0/20 143.55.64.0/20 2a0a:a440::/29 2606:50c0::/32
+        php_fastcgi php:9000
+        file_server
+    }
+
+    handle {
+        import ipfilter 
+        basic_auth {
+            admin {$CADDY_AUTH_HASH}
+        }
+        php_fastcgi php:9000
+        file_server
+    }
 }
 
