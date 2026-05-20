@@ -4,21 +4,30 @@
 </head>
 <body>
   <h1>Training Hub</h1>
-	<p>Welcome to training hub. The purpose of this site is to provide you with a platform on which to manage a small project to design a website using github to manage the project. This server should give you all the tools to get a temporary github account to join your github organisation. To be assigned into groups and to clone a reposiroty from a template and start to engineer your own mini website project.</p>
-	<p>You will be given a tempory email address for this project with which you need to register an account on GitHub.</p>
-	<p>You will then be invited to join a project on GitHub where you will find a repository and a basic project board.</p>
-	<p>You can find your email server <a class="sub" href="email">here</a>. Your password is the group username + '-' + your account name. And you can only receive email to this address.</p>
+  <p>Welcome to training hub. The purpose of this site is to provide you with a platform on which to manage a small project to design a website, using github to manage the project. This server should give you all the tools to get a GitHub account and to join our GitHub Organisation. Your account will be assigned into groups and you will have access to a templated repository. From that point you will be able to engineer your own mini-website project which will be served under <a class="suburl" href="pages">pages.</a>.</p>
+	<p>You will be given a tempory, receive only email address for this project with which you need to register an account on GitHub. It can only receive authentic GitHub mail.</p>
+  <p>You will then be invited to join an <i>Organisation</i> on GitHub where you will find a repository and a basic project board.</p>
+	<p>You can find your email server <a class="sub" href="email">here</a>. Your password is the group code (ask your tutor) + '-' + your account name.</p>
 	<p>You can find your Jupyter server <a class="sub" href="jupyter">here</a>. Use Jupyter to edit files and track your github repo.</p>
   <h3>Students</h3>
-  <p>Start by registering a GitHub account at <a href="https://github.com/signup">https://github.com/signup</a>. You will need to use your temporary email address which should be of the form <span style="color:blue;" id="email"></span>. The sign up process requires a <b>Launch Code</b> which you will receive by email. You will need to follow instructions in that email. You will also receive an invitation to join a team called pupils (this should happen automatically do not worry about this).</p>
-  <p>Once that is done your tutor will need to assign you to your team</p>
-  <p>You will then need to log into GitHub and navigate to your organisation</p>
-  <p>Please be aware that github is a real service. There are lots of ways to use it. Please use the service only for this project.
-  Github will delete accounts if they are used inapropriately and it is easy to accidentally delete your work or remove yourselves from teams/organisations/reposiroties/and projects. Take care, you are in the professional world for this project.
+  <p>Start by registering a GitHub account at <a href="https://github.com/signup">https://github.com/signup</a>. You will then need to login to your temporary email address which should be of the form <span style="color:blue;" id="email"></span>. The sign up process requires a <b>Launch Code</b> which you will receive by email. You will need to follow instructions in that email. You will also receive an invitation to join a group-wide team (this should happen automatically do not worry about this).</p>
+  <p>Once that is done your tutor will need to assign you to your specific team.</p>
+  <p>You will then need to log into GitHub and navigate to your Organisation.</p>
+  <p>Please be aware that GitHub is a real service. There are lots of ways to use it. Please use the service only for this project.
+  Github will delete accounts if they are used inapropriately and it is easy to accidentally delete your work or remove yourselves from teams/organisations/reposiroties/and projects. Take care, you are in the professional world for this project.</p>
   <h3>Tutors and administrators</h3>
   <p>You will find a page showing the progress of your class' enrolement progress <a href="class">here</a>. Once the class has registered for a github account they can be assigned to teams via that page.</p> 
 <script>
   document.getElementById('email').textContent = 'firstname.surname@'+window.location.hostname;
+</script>
+<script>
+const hostname = window.location.hostname;
+const protocol = window.location.protocol;
+document.querySelectorAll("a.suburl").forEach(link => {
+    const sub = link.getAttribute("href");
+    link.href = `${protocol}//${sub}.${hostname}`;
+    link.textContent = `${sub}.${hostname}`;
+});
 </script>
 <script>
 const hostname = window.location.hostname;
