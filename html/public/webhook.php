@@ -1,6 +1,7 @@
 <?php
 putenv('GIT_TERMINAL_PROMPT=0');
 putenv('GIT_ASKPASS=/usr/local/bin/git-askpass');
+$githubOrg = $_ENV['GITHUB_ORG'] ?? '';
 
 $secret = trim(file_get_contents('/run/secrets/github_webhook_secret'));
 $payload = file_get_contents('php://input');
@@ -36,17 +37,15 @@ if (($data['ref'] ?? '') !== 'refs/heads/main') {
 $repo = $data['repository']['name'] ?? null;
 
 $cmd="";
-$repoDir = "/srv/html/Repos/$repo";
-if (  is_dir("/srv/html/Repos/$repo") ) {
-  $cmd = sprintf('cd %s && git pull --ff-only 2>&1', escapeshellarg($repoDir));
+if ( is_dir("/srv/html/Repos/$repo") ) {
+  $cmd = sprintf('cd %s && git pull --ff-only 2>&1', escapeshellarg("/srv/html/Repos/$repo"));
   $output = shell_exec($cmd);
 }
 else {
-  $output="Nothing";
+  $cmd = sprintf('cd /srv/html/Repos && git clone --ff-only %s 2>&1', escapeshellarg("https://github.org/$githubOrg/$repo.git"));
+  $output = shell_exec($cmd);
 }
 
 header('Content-Type: text/plain');
-echo getmyuid();
-echo "$output\n";
-echo "$cmd\n";
+echo "OK";
 ?>
