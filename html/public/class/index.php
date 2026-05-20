@@ -99,7 +99,7 @@ foreach (scandir($mailRoot) as $user) {
     // Output row https://email.rsemcr.uk/?_user=
     echo "<tr>";
     echo '<td><a href="https://email.' .$_SERVER['HTTP_HOST'].'/?_user='.urlencode($user).'">'.htmlspecialchars($user)."</a></td>";
-    echo '<td><a href="https://github.com/"' . urlencode($github) . '">'.htmlspecialchars($github)."</a></td>";
+    echo '<td><a href="https://github.com/' . urlencode($github) . '">'.htmlspecialchars($github)."</a></td>";
 #    echo "<td>" . htmlspecialchars(implode(', ', $userGroups)) . "</td>";
     echo "<td>" . implode(', ', array_map( fn($team) => sprintf('<a href="https://github.com/orgs/%s/teams/%s">%s</a>',
                           urlencode($githubOrg), urlencode($team), htmlspecialchars($team)),$userGroups))."</td>";
