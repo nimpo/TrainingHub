@@ -9,23 +9,19 @@ then
 
   flock -n "/teams/.lock" bash -c '
     ME=`gh api user |jq -j .login`
-    echo "Polling for groups"
     while read team
     do
-      echo "Got $team:"
+      echo "Pulling $team onto /teams/$team"
       gh api -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2026-03-10" /orgs/$GITHUB_ORG/teams/$team/members \
         | jq -r .[].login \
         | grep -v "^$ME$" \
-        | tee /teams/$team
-      echo
+        > /teams/$team
       if [ "$team" = "$CLASSNAME" ]
       then
-        echo "Checking $CLASSNAME"
         while read member 
         do
           if [ "$member" ]
           then
-            echo "Checking this member=$member"
             if ! grep -q "^$member$" /teams/$team 
             then
               echo "Member $member is not in the team $team, lets add them"
