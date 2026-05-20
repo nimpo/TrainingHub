@@ -42,7 +42,7 @@ if ( is_dir("/srv/html/Repos/$repo") ) {
   $output = shell_exec($cmd);
 }
 else {
-  $cmd = sprintf('cd /srv/html/Repos && git clone --ff-only %s 2>&1', escapeshellarg("https://github.org/$githubOrg/$repo.git"));
+  $cmd = sprintf('cd /srv/html/Repos && git clone %s 2>&1', escapeshellarg("https://github.org/$githubOrg/$repo.git"));
   $output = shell_exec($cmd);
 }
 
