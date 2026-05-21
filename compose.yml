@@ -133,6 +133,7 @@ services:
       - ./getmail/config:/etc/getmail:ro
       - ./mail:/srv/vmail
       - ./state/getmail:/var/lib/getmail
+      - ./allowed-emails.txt:/home/getmail/allowed-emails.txt
     command: >
       sh -lc '
         envsubst < /etc/getmail/getmailrc.template > /home/getmail/getmailrc &&
