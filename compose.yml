@@ -153,6 +153,7 @@ services:
       DOMAIN: ${DOMAIN}
       ACME_EMAIL: "admin@${DOMAIN}"
       FQDNS: "${DOMAIN} jupyter.${DOMAIN} email.${DOMAIN} *.pages.${DOMAIN}"
+      PAGESFQDN: "pages.${DOMAIN}"
       AWS_CONFIG_FILE: /run/secrets/aws_config
       AWS_SHARED_CREDENTIALS_FILE: /run/secrets/aws_credentials
     secrets:
@@ -162,16 +163,21 @@ services:
     working_dir: /app/acme-le-bash
     command: >
       bash -lc '
-        reqfunction() {
-          /app/acme-le-bash/acme.sh -C "$1" -k "$2" $$VERBOSE -DAWS -e "$$ACME_EMAIL" $${FQDNS[@]}
-        }
-        export -f reqfunction
         while true
         do
-          ./monitorCert.sh -v -capath /etc/ssl/certs \
-            -cert /certs/site.crt \
-            -key /certs/site.key \
-            $$FQDNS
+
+          reqfunction() {
+            /app/acme-le-bash/acme.sh -C "$1" -k "$2" $$VERBOSE -DAWS -e "$$ACME_EMAIL" $${FQDNS[@]}
+          }
+          export -f reqfunction
+          ./monitorCert.sh -v -capath /etc/ssl/certs -cert /certs/site.crt -key /certs/site.key $$FQDNS
+          # Try a hack to get round wildcard and non wildcard clash. when acme-le-bash fixes this issue just add pages.domain to FQDNS
+          reqfunction() {
+            /app/acme-le-bash/acme.sh -C "$1" -k "$2" $$VERBOSE -DAWS -e "$$ACME_EMAIL" $${PAGESFQDN[@]}
+          }
+          export -f reqfunction
+          ./monitorCert.sh -v -capath /etc/ssl/certs -cert /certs/pages.crt -key /certs/pages.key $$PAGESFQDN
+
           sleep 86400
         done
       '

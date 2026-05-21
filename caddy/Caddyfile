@@ -22,7 +22,7 @@ jupyter.{$DOMAIN} {
 
 pages.{$DOMAIN} {
     import ipfilter
-    tls /certs/site.crt /certs/site.key
+    tls /certs/pages.crt /certs/pages.key
     root * /srv/html/Repos
     rewrite * /index.php
     php_fastcgi php:9000
