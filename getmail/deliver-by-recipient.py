@@ -23,6 +23,8 @@ def invite_email_to_github_org(email):
 
     payload = { "email": email, "role": "direct_member", }
 
+    print(f"Inviting {email} to {classname}")
+
     req = urllib.request.Request(
         f"https://api.github.com/orgs/{org}/invitations",
         data=json.dumps(payload).encode("utf-8"),
@@ -39,7 +41,7 @@ def invite_email_to_github_org(email):
         with urllib.request.urlopen(req, timeout=10) as response:
             return response.status
     except urllib.error.HTTPError as e:
-#        logging.warning("GitHub org invite failed for %s; Status: %s",email,e.code)
+        print(f"GitHub org invite failed for {email}; Status: {e.code}")
         return None
 
 domain = os.environ.get("DOMAIN")
@@ -63,15 +65,26 @@ if not m:
 # Get message type and authenticity
 from_addr = parseaddr(msg.get("From", ""))[1].lower()
 subject = str(msg.get("Subject", ""))
-auth_results = "\n".join(msg.get_all("ARC-Authentication-Results", []))
+auth_results = msg.get("ARC-Authentication-Results","")
 dkim = "\n".join(msg.get_all("DKIM-Signature", []))
 categories = msg.get("categories", "")
 
-if not "dkim=pass" in auth_results.lower():
-    sys.exit("no dkim pass in ARC-Authentication-Results")
+if not re.search(rf"\bdkim=pass\b.*?\bdmarc=pass\b.*?\bheader\.from={re.escape(from_domain)}\b",auth_results,re.IGNORECASE):
+    sys.exit(1)
 
-if not "d=github.com" in dkim.lower():
-    sys.exit("dkim signature not from github")
+with open("/home/getmail/allowed-emails.txt") as f:
+    allowed_emails = {
+        line.strip().lower()
+        for line in f
+        if line.strip() and not line.startswith("#")
+    }
+
+if re.search(r"@(?:.*\.)?github\.com$", emailaddress, re.IGNORECASE):
+    print("Valid Github mail.")
+elif emailaddress.lower() in allowed_emails:
+    print("Mail from allowed list.")
+else:
+    sys.exit(1)
 
 # If is a github launch code then invite to org
 if "Your GitHub launch code" in subject:
