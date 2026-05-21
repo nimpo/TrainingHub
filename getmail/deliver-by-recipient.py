@@ -64,6 +64,7 @@ if not m:
 
 # Get message type and authenticity
 from_addr = parseaddr(msg.get("From", ""))[1].lower()
+from_domain = from_addr.rsplit("@", 1)[1]
 subject = str(msg.get("Subject", ""))
 auth_results = msg.get("ARC-Authentication-Results","")
 dkim = "\n".join(msg.get_all("DKIM-Signature", []))
