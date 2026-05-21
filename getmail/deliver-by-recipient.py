@@ -82,7 +82,7 @@ with open("/home/getmail/allowed-emails.txt") as f:
 
 if re.search(r"@(?:.*\.)?github\.com$", from_addr, re.IGNORECASE):
     print("Valid Github mail.")
-elif emailaddress.lower() in allowed_emails:
+elif from_addr.lower() in allowed_emails:
     print("Mail from allowed list.")
 else:
     sys.exit(1)
