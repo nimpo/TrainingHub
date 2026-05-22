@@ -59,7 +59,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           $members=$client->api('organization')->teams()->members($slug,$githubOrg);
           $usernames = [];
           foreach ($members as $member) { $usernames[] = $member['login']; }
-          file_put_contents($groupRoot .'/'.$slug, implode("\n", $usernames));
+          file_put_contents($groupRoot .'/'.$slug, implode("\n", $usernames)."\n");
         }
     }
     fclose($lockHandle);

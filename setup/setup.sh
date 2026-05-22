@@ -5,14 +5,14 @@ export GH_TOKEN=`cat /run/secrets/github_token`
 
 if [ -f /state/setup-complete ]
 then
-  gh api -H "Accept: application/vnd.github+json"   -H "X-GitHub-Api-Version: 2026-03-10" /orgs/UoMRIT4SalfordCityAcademy/members |jq -r .[].login > /tmp/members
+  gh api -H "Accept: application/vnd.github+json"   -H "X-GitHub-Api-Version: 2026-03-10" "/orgs/$GITHUB_ORG/members" |jq -r .[].login > /tmp/members
 
   flock -n "/teams/.lock" bash -c '
     ME=`gh api user |jq -j .login`
     while read team
     do
       echo "Pulling $team onto /teams/$team"
-      gh api -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2026-03-10" /orgs/$GITHUB_ORG/teams/$team/members \
+      gh api -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2026-03-10" "/orgs/$GITHUB_ORG/teams/$team/members" \
         | jq -r .[].login \
         | grep -v "^$ME$" \
         > /teams/$team
@@ -25,7 +25,8 @@ then
             if ! grep -q "^$member$" /teams/$team 
             then
               echo "Member $member is not in the team $team, lets add them"
-              gh api --method PUT -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2026-03-10" /orgs/$GITHUB_ORG/teams/$team/memberships/$member | jq .
+              gh api --method PUT -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2026-03-10" "/orgs/$GITHUB_ORG/teams/$team/memberships/$member" | jq .
+              echo "$member" >> /teams/$team
             fi
           fi   
         done < <( grep -v "^$ME$" /tmp/members )
