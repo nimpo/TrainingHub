@@ -42,7 +42,7 @@ docker compose up -d
 ```
 
 Have DNS records or entries in /etc/hosts that point to hosting service ip.
-Consider createing the following records in DNS:
+Consider creating the following records in DNS:
 
 | Type   | Name                            | Target                          |
 |--------|---------------------------------|---------------------------------|
