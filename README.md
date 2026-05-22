@@ -7,11 +7,11 @@ An instance of TrainingHub provides several user facing services.
    - A password protected https://traininghub.example.org/class which will show the registration progress and allow you to manage your teams.
  - A stripped down webmail email client (receive only from a set of limited addresses) `https://email.traininghub.example.org`
  - A stripped down (no kernel) Jupyter Hub with docker image execution environment with git plugin, `https://jupyter.traininghub.example.org`
- - Your server will listen for github webhook connections at `https://traininghub.example.org/webhooks.php`, if this is exposed then the server will populate `pages.traininghub.example.org` and `<repo>.pages.traininghub.example.org` with any `/public_html/` content from each `<repo>`. Alternatively you can setup a github Pages for your repos.
+ - Your server will listen for GitHub webhook connections at `https://traininghub.example.org/webhooks.php`, if this is exposed then the server will populate `pages.traininghub.example.org` and `<repo>.pages.traininghub.example.org` with any `/public_html/` content from each `<repo>`. Alternatively you can setup a GitHub Pages for your repos.
 
-The email serivce is primarily designed so that personal classroom email addresses, can be used to apply for a personal github account [See here](https://docs.github.com/en/get-started/start-your-journey/creating-an-account-on-github#signing-up-for-a-new-personal-account).
+The email serivce is primarily designed so that personal classroom email addresses, can be used to apply for a personal GitHub account [See here](https://docs.github.com/en/get-started/start-your-journey/creating-an-account-on-github#signing-up-for-a-new-personal-account).
 
-TrainingHub is a docker environment. It can be run on a public or private network. Some outbound connectivity is needed to reach LetsEncrypt's ACME certificate service and pull mail from a catchall IMAP account of your choice I use [Forward Email](https://forwardemail.net). If on a public network access can be restricted by firewall, and in any case, https server will return Forbidden to any requests outside a set group of IP addresses which can be confivured in the `.env` configuration file.
+TrainingHub is a docker environment. It can be run on a public or private network. Some outbound connectivity is needed to reach LetsEncrypt's ACME certificate service and pull mail from a catchall IMAP account of your choice I use [Forward Email](https://forwardemail.net). If on a public network access can be restricted by firewall, and in any case, https server will return Forbidden to any requests outside a set group of IP addresses which can be configured in the `.env` configuration file.
 
 # Requirements
  - Route53 controled DNS zone with an api key with permissions to update the records (for Let's encrypt)
