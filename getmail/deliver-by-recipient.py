@@ -72,13 +72,15 @@ categories = msg.get("categories", "")
 
 if not re.search(rf"\bdkim=pass\b.*?\bdmarc=pass\b.*?\bheader\.from={re.escape(from_domain)}\b",auth_results,re.IGNORECASE):
     sys.exit(1)
-
-with open("/home/getmail/allowed-emails.txt") as f:
-    allowed_emails = {
-        line.strip().lower()
-        for line in f
-        if line.strip() and not line.startswith("#")
-    }
+try:
+    with open("/home/getmail/allowed-emails.txt") as f:
+        allowed_emails = {
+            line.strip().lower()
+            for line in f
+            if line.strip() and not line.startswith("#")
+        }
+except FileNotFoundError:
+    allowed_emails = set()
 
 if re.search(r"@(?:.*\.)?github\.com$", from_addr, re.IGNORECASE):
     print("Valid Github mail.")
