@@ -162,6 +162,7 @@ services:
     volumes:
       - ./certs:/certs
     working_dir: /app/acme-le-bash
+    restart: unless-stopped
     command: >
       bash -lc '
         ./checkdns.sh || exit 1
