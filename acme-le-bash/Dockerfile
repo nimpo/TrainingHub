@@ -23,3 +23,7 @@ WORKDIR /app
 RUN git clone https://github.com/nimpo/acme-le-bash.git
 
 WORKDIR /app/acme-le-bash
+
+COPY checkdns.sh .
+
+RUN chmod u+x checkdns.sh

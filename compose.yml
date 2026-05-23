@@ -164,6 +164,7 @@ services:
     working_dir: /app/acme-le-bash
     command: >
       bash -lc '
+        ./checkdns.sh || exit 1
         while true
         do
 
