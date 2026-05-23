@@ -16,5 +16,5 @@ if [ "$IP" -a "$IP" != "$DNSIP" ]
 then
   HOSTED_ZONE_ID=`aws --output json route53 list-hosted-zones-by-name --dns-name "$ZONE_APEX" | jq -r '.HostedZones[0].Id' |sed -e 's#^/hostedzone/\([A-Z0-9]*\).*$#\1#' | grep '^[A-Z0-9]\{1,\}$'`
   BATCH='{"Changes": [{ "Action": "UPSERT", "ResourceRecordSet": {"Name": "'$DOMAIN'", "Type": "A", "TTL": 300, "ResourceRecords": [{"Value":"'$IP'"}]}}]}'
-  aws route53 change-resource-record-sets --hosted-zone-id "$HOSTED_ZONE_ID" --change-batch $BATCH
+  aws route53 change-resource-record-sets --hosted-zone-id "$HOSTED_ZONE_ID" --change-batch "$BATCH"
 fi
