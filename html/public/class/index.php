@@ -141,7 +141,7 @@ echo "<h3>All Teams</h3>";
 echo "<p>".implode(', ',
             array_map(
               fn($team) => sprintf('<a href="https://github.com/orgs/%s/teams/%s">%s</a>',urlencode($githubOrg), urlencode($team), htmlspecialchars($team)),
-              array_filter($groups,fn($team) => $team !== $class)
+              array_filter(array_keys($groups),fn($team) => $team !== $class)
             )
           )."</p>";
 ?>
