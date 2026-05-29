@@ -27,47 +27,6 @@ $client->authenticate(
 $mailRoot  = '/srv/html/mail';
 $groupRoot = '/srv/html/teams';
 
-#################################
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $lockHandle = fopen($groupRoot.'/.lock', 'c');
-    if (flock($lockHandle, LOCK_EX)) {
-        foreach ($_POST['group'] as $email => $teamSlug) {
-            if ($teamSlug === '') { continue; }
-            $githubFile = $mailRoot . '/' . $email . '/Maildir/githubname';
-            if (!file_exists($githubFile)) { continue; }
-            $githubUsername = trim(file_get_contents($githubFile));
-            if ($githubUsername === '') { continue; }
-            if ($_POST['action'] == "add") {
-                try {
-                    $res=$client->api('organization')->teams()->addMember($teamSlug, $githubUsername,$githubOrg);
-                } catch (Exception $e) {
-                    file_put_contents('php://stderr', "Failed to add ".$githubUsername." to ".$teamSlug.": ".$e->getMessage());
-                }
-            }
-            elseif ($_POST['action'] == "remove") {
-                try {
-                    $res=$client->api('organization')->teams()->removeMember($teamSlug, $githubUsername,$githubOrg);
-                } catch (Exception $e) {
-                    file_put_contents('php://stderr', "Failed to remove ".$githubUsername." from ".$teamSlug.": ".$e->getMessage());
-                }
-            }
-        }
-        # Do the refresh
-        $teams = $client->api('organization')->teams()->all($githubOrg);
-        foreach ($teams as $team) {
-          $slug = $team['slug'];
-          $members=$client->api('organization')->teams()->members($slug,$githubOrg);
-          $usernames = [];
-          foreach ($members as $member) { $usernames[] = $member['login']; }
-          file_put_contents($groupRoot .'/'.$slug, implode("\n", $usernames)."\n");
-        }
-    }
-    fclose($lockHandle);
-    header("Location: " . strtok($_SERVER["REQUEST_URI"], '?'));
-    exit;
-}
-####################################
-
 $groups = [];
 foreach (preg_grep('/^([^.])/', scandir($groupRoot)) as $file) {
     if ($file === '.' || $file === '..') { continue; }
@@ -76,10 +35,8 @@ foreach (preg_grep('/^([^.])/', scandir($groupRoot)) as $file) {
     $members = file($fullPath, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
     $groups[$file] = $members;
 }
-
-echo "<form method='POST'>";
 echo "<table border='1' cellpadding='5'>";
-echo "<tr><th>Email.</th><th>GitHub</th><th>Groups</th><th>Add To Group</th>";
+echo "<tr><th>Email.</th><th>GitHub</th><th>Team</th>";
 echo "</tr>";
 
 foreach (scandir($mailRoot) as $user) {
@@ -98,44 +55,31 @@ foreach (scandir($mailRoot) as $user) {
 
     // Output row https://email.rsemcr.uk/?_user=
     echo "<tr>";
-    echo '<td><a href="https://email.' .$_SERVER['HTTP_HOST'].'/?_user='.urlencode($user).'">'.htmlspecialchars($user)."</a></td>";
-    echo '<td><a href="https://github.com/' . urlencode($github) . '">'.htmlspecialchars($github)."</a></td>";
-#    echo "<td>" . htmlspecialchars(implode(', ', $userGroups)) . "</td>";
-    echo "<td>" . 
-      implode(', ', 
-        array_map( 
-          fn($team) => sprintf('<a href="https://github.com/orgs/%s/teams/%s">%s</a>',urlencode($githubOrg), urlencode($team), htmlspecialchars($team)),
-          array_filter($userGroups,fn($team) => $team !== $class)
-        )  
-      )."</td>";
-    echo "<td>";
-    if ($github != "") {
-        echo "<select name='group[$user]'>";
-        echo "<option value=''>Select group</option>";
-        foreach ($groups as $groupName => $members) {
-            if ($groupName == $class) {continue;}
-            echo "<option value='" . htmlspecialchars($groupName) . "'>";
-            echo htmlspecialchars($groupName);
-            echo "</option>";
-        }
-        echo "</select>";
+    if ( $_SERVER['PHP_AUTH_USER'] == $user ) {
+      echo '<td><a href="https://email.' .$_SERVER['HTTP_HOST'].'/?_user='.urlencode($user).'">'.htmlspecialchars($user)."</a></td>";
+      echo '<td><a href="https://github.com/' . urlencode($github) . '">'.htmlspecialchars($github)."</a></td>";
+      echo "<td>" . 
+        implode(', ', 
+          array_map( 
+            fn($team) => sprintf('<a href="https://github.com/orgs/%s/teams/%s">%s</a>',urlencode($githubOrg), urlencode($team), htmlspecialchars($team)),
+            array_filter($userGroups,fn($team) => $team !== $class)
+          )  
+        )."</td>";
+    } else {
+#      echo '<td>'.htmlspecialchars($user)."</td>";
+      echo '<td></td>';
+      echo '<td>'.htmlspecialchars($github)."</td>";
+      echo "<td>".
+        implode(', ', 
+          array_map( 
+            fn($team) => sprintf('%s',htmlspecialchars($team)),
+            array_filter($userGroups,fn($team) => $team !== $class)
+          )  
+        )."</td>";
     }
-    echo "</td></tr>";
+    echo "</tr>";
 }
-echo "<tr>";
-echo "<td colspan='3'></td>";
-echo "<td>";
-echo "<input type='submit' name='action' value='add'>";
-echo "</td>";
-echo "</tr>";
-echo "<tr>";
-echo "<td colspan='3'></td>";
-echo "<td>";
-echo "<input type='submit' name='action' value='remove'>";
-echo "</td>";
-echo "</tr>";
 echo "</table>";
-echo "</form>";
 ?>
 
 <script>
