@@ -70,6 +70,7 @@ services:
     secrets:
       - github_token
       - github_webhook_secret
+      - group_password
     env_file:
       - .env
     environment:
