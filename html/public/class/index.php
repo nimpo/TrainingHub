@@ -98,7 +98,8 @@ foreach (scandir($mailRoot) as $user) {
 
     // Output row https://email.rsemcr.uk/?_user=
     echo "<tr>";
-    echo '<td><a href="https://email.' .$_SERVER['HTTP_HOST'].'/?_user='.urlencode($user).'">'.htmlspecialchars($user)."</a></td>";
+#    echo '<td><a href="https://email.' .$_SERVER['HTTP_HOST'].'/?_user='.urlencode($user).'">'.htmlspecialchars($user)."</a></td>";
+    echo '<td><a href="mailto:'.urlencode($user).'@'.$_SERVER['HTTP_HOST'].'">'.htmlspecialchars($user)."</a></td>";
     echo '<td><a href="https://github.com/' . urlencode($github) . '">'.htmlspecialchars($github)."</a></td>";
 #    echo "<td>" . htmlspecialchars(implode(', ', $userGroups)) . "</td>";
     echo "<td>" . 
@@ -136,6 +137,13 @@ echo "</td>";
 echo "</tr>";
 echo "</table>";
 echo "</form>";
+echo "<h3>All Teams</h3>";
+echo "<p>".implode(', ',
+            array_map(
+              fn($team) => sprintf('<a href="https://github.com/orgs/%s/teams/%s">%s</a>',urlencode($githubOrg), urlencode($team), htmlspecialchars($team)),
+              array_filter($groups,fn($team) => $team !== $class)
+            )
+          )."</p>";
 ?>
 
 <script>
