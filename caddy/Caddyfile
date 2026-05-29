@@ -58,18 +58,39 @@ pages.{$DOMAIN} {
     }
 
     @students {
-        path /students
+        path /students /students/*
     }
 
-    
     handle @students {
-        import ipfilter 
-        basic_auth {
-            admin {$CADDY_AUTH_HASH}
+        import ipfilter
+        forward_auth php:9000 {
+            uri /auth.php
+            transport fastcgi {
+                root /srv/html/public
+                split .php
+            }
         }
+
         php_fastcgi php:9000
         file_server
     }
+
+    @auth_endpoint {
+        path /auth.php
+    }
+
+    handle @auth_endpoint {
+        respond "Not found" 404
+    }
+    
+#    handle @students {
+#        import ipfilter 
+#        basic_auth {
+#            admin {$CADDY_AUTH_HASH}
+#        }
+#        php_fastcgi php:9000
+#        file_server
+#    }
 
     handle {
         import ipfilter 
