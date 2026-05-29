@@ -1,6 +1,6 @@
 # Secrets
 
-## In this directory you should have seven files:
+## In this directory you should have eight files:
 ### `aws-config` 
 containing AWS Cli config
 
@@ -26,6 +26,13 @@ A single line which contains the prefix to your group password
 Example file content:
 ```
 SingleLineGroupPasswordPrefix
+```
+### `admin_passwd.txt` 
+A single line which contains the prefix to your web admin password
+
+Example file content:
+```
+SingleLineAdminPasswordPrefix
 ```
 ### `imap_password.txt`
 The password of the account you set up in forwardemail for incoming emails

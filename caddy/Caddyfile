@@ -57,10 +57,24 @@ pages.{$DOMAIN} {
         file_server
     }
 
-    handle {
+    @students {
+        path /students
+    }
+
+    
+    handle @students {
         import ipfilter 
         basic_auth {
             admin {$CADDY_AUTH_HASH}
+        }
+        php_fastcgi php:9000
+        file_server
+    }
+
+    handle {
+        import ipfilter 
+        basic_auth {
+            admin {$CADDY_AUTH_AHASH}
         }
         php_fastcgi php:9000
         file_server

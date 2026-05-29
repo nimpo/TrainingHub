@@ -47,10 +47,13 @@ services:
     restart: unless-stopped
     secrets:
       - group_password
+      - admin_password
     command: >
       sh -c '
         HASH=$$(caddy hash-password --plaintext "$$(cat /run/secrets/group_password)")
+        AHASH=$$(caddy hash-password --plaintext "$$(cat /run/secrets/admin_password)")
         export CADDY_AUTH_HASH=$$HASH
+        export CADDY_AUTH_AHASH=$$AHASH
         exec caddy run --config /etc/caddy/Caddyfile
       '
 
@@ -209,6 +212,8 @@ secrets:
     file: ./secrets/aws-config
   group_password:
     file: ./secrets/group_password.txt
+  admin_password:
+    file: ./secrets/admin_password.txt
   jupyterhub_admin_password:
     file: ./secrets/jupyterhub_admin_password.txt
   github_token:
