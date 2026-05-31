@@ -39,7 +39,7 @@ pages.{$DOMAIN} {
     tls /certs/site.crt /certs/site.key
     root * /srv/html/public
     @public {
-        path / /index.html
+        path / /index.html /css/base.css
     }
 
     handle @public {

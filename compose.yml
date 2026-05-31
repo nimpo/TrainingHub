@@ -71,6 +71,7 @@ services:
       - github_token
       - github_webhook_secret
       - group_password
+      - admin_password
     env_file:
       - .env
     environment:

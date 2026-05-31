@@ -76,10 +76,16 @@ foreach (preg_grep('/^([^.])/', scandir($groupRoot)) as $file) {
     $members = file($fullPath, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
     $groups[$file] = $members;
 }
+echo '<html><head><title>Tutors Page</title><link rel="stylesheet" href="/css/base.css" /></head>';
+echo '<body>';
 
+echo '<h1>Tutor page</h1>';
+echo '<p>Instruction on how to help your cohort to enrol can be found <a href="tutors.html">here</a>.<br />Below is a list of all students the system knows about and how far through the registration process they are.</p>';
+echo '<p>Use this form to assign teams to your students.</h3>';
+echo '<h3>Class progress</h3>';
 echo "<form method='POST'>";
 echo "<table border='1' cellpadding='5'>";
-echo "<tr><th>Email.</th><th>GitHub</th><th>Groups</th><th>Add To Group</th>";
+echo "<tr><th>Email.</th><th>GitHub</th><th>Teams</th><th>Add To Group</th>";
 echo "</tr>";
 
 foreach (scandir($mailRoot) as $user) {
@@ -177,3 +183,5 @@ startRefreshTimer();
 
 </script>
 <p>Page refreshes every minute</p>
+</body>
+</html>
