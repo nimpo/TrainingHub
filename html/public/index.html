@@ -18,7 +18,10 @@
 const hostname = window.location.hostname;
 const protocol = window.location.protocol;
 
-document.getElementById('email').textContent = 'firstname.surname@'+hostname;
+const emailElement = document.getElementById('email');
+if (emailElement) {
+    emailElement.textContent = 'firstname.surname@' + hostname;
+}
 
 document.querySelectorAll("a.suburl").forEach(link => {
     const sub = link.getAttribute("href");
