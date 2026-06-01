@@ -58,7 +58,7 @@ pages.{$DOMAIN} {
     }
 
     @students {
-        path /students /students/*
+        path /students /images/* /students/*
     }
 
     handle @students {
