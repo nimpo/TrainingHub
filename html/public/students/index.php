@@ -49,7 +49,7 @@ foreach (scandir($mailRoot) as $user) {
     if ($user === '.' || $user === '..') { continue; }
     $userDir = $mailRoot . '/' . $user;
     if (!is_dir($userDir)) { continue; }
-    $githubFile = $userDir . '/Maildir/githubname';
+    $githubFile = $userDir . '/Maildir/githublogin';
     $github = '';
     if (file_exists($githubFile)) { $github = trim(file_get_contents($githubFile)); }
     $userGroups = [];
