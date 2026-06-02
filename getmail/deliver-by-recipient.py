@@ -10,13 +10,12 @@ from email.utils import parseaddr
 import json
 import urllib.request
 import urllib.error
+from pathlib import Path
 
 classname = os.environ.get("CLASSNAME","default")
+org = os.environ.get("GITHUB_ORG")
 
 def invite_email_to_github_org(email):
-    org = os.environ.get("GITHUB_ORG")
-    if not org:
-        return
 
     with open("/run/secrets/github_token") as f:
         token = f.read().strip()
@@ -100,10 +99,59 @@ os.makedirs(f"{maildir}", exist_ok=True)
 
 # Special case where github mail says added to special team
 if "org-team-add-member" in categories and classname in subject:
+
+    # Get name from email and record it
     to_name, to_addr = parseaddr(msg.get("To", ""))
     username = to_name.strip()
     with open(f"{maildir}/githubname", "w") as f:
         f.write(username)
+
+    # define a getter for gh # could use this more widely
+    with open("/run/secrets/github_token") as f:
+        token = f.read().strip()
+    def github_get(url):
+        req = urllib.request.Request(
+            url,
+            headers={
+                "Authorization": f"Bearer {token}",
+                "Accept": "application/vnd.github+json",
+                "X-GitHub-Api-Version": "2022-11-28",
+            },
+        )
+        try:
+            with urllib.request.urlopen(req) as response:
+                return json.load(response)
+        except urllib.error.HTTPError as e:
+            if e.code == 404:
+                return None
+            raise
+    # Does the profile exist given this name?
+    profile = github_get(f"https://api.github.com/users/{username}")
+    if profile is not None and profile.get("name") in (None, username):
+        print(f"{username}'s login is same {username} will push {username} into {maildir}/githublogin")
+        with open(f"{maildir}/githublogin", "w") as f:
+            f.write(username)
+    else:
+        print(f"{username}'s login is NOT {username} will need to find the correct login from org infos")
+        known_logins = set()
+        for name_file in Path('/srv/vmail/').glob("*/Maildir/githubname"):
+            thismaildir = name_file.parent
+            github_name = name_file.read_text(encoding="utf-8").strip()
+            login_file = thismaildir / "githublogin"
+            if login_file.exists():
+                known_logins.add(login_file.read_text(encoding="utf-8").strip())
+
+        members = github_get( f"https://api.github.com/orgs/{org}/teams/{classname}/members")
+        if members is None:
+            raise RuntimeError("Could not fetch team members")
+        candidate_logins = [ member["login"] for member in members if member["login"] not in known_logins ]
+        for login in candidate_logins:
+            profile = github_get(f"https://api.github.com/users/{login}")
+            if profile is not None and profile.get("name") == username:
+                print(f"{username}'s login is {login} will push {login} into {maildir}/githublogin")
+                with open(f"{maildir}/githublogin", "w") as f:
+                    f.write(login)
+                break
 
 os.makedirs(f"{maildir}/cur", exist_ok=True)
 os.makedirs(f"{maildir}/new", exist_ok=True)
