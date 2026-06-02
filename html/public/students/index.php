@@ -40,6 +40,7 @@ echo '<body>';
 echo '<h1>Student page</h1>';
 echo '<p>Instructions for your first step: how to get a github account, can be found <a href="setup.html">here</a>.</p>';
 echo '<p>Instructions for all your next steps: how use your github account and complete the project, can be found <a href="github.html">here</a>.</p>';
+echo '<p>Schedule for the comming weeks: <a href="schedule.html">click here!</a>.</p>';
 echo '<h3>Your class registration progress</h3>';
 echo "<table border='1' cellpadding='5'>";
 echo "<tr><th>Email.</th><th>GitHub</th><th>Team</th>";
